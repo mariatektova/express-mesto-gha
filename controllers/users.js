@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const User = require('../models/user');
 const { ERROR, ERROR_NOT_FOUND, ERROR_DEFAULT } = require('../utils/constants');
 
@@ -61,7 +62,7 @@ const editProfile = (req, res) => {
   User.findByIdAndUpdate(
     owner,
     { name, about },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((user) => checkUserId(user, res))
     .catch((error) => {
@@ -79,7 +80,6 @@ const editProfile = (req, res) => {
 const updateAvatar = (req, res) => {
   const owner = req.user._id;
   const avatar = req.body;
-
 
   User.findByIdAndUpdate(owner, avatar, { new: true, runValidators: true })
     .then((user) => checkUserId(user, res))

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const Card = require('../models/card');
 
 const { ERROR, ERROR_NOT_FOUND, ERROR_DEFAULT } = require('../utils/constants');
@@ -50,7 +51,7 @@ const deleteCard = (req, res) => {
       if (card.deletedCount === 0) {
         return res
           .status(ERROR_NOT_FOUND)
-          .send({ message: 'Карточки с таким id не существует'});
+          .send({ message: 'Карточки с таким id не существует' });
       }
       return res.send({ message: 'Карточка удалена' });
     })
@@ -91,7 +92,7 @@ const putLike = (req, res) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: owner } },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((card) => checkCardId(card, res))
     .catch((error) => {
