@@ -1,9 +1,4 @@
-const allowedCors = [
-  'http://domainname.andrey.nomoredomains.sbs',
-  'https://domainname.andrey.nomoredomains.sbs',
-  'http://localhost:3000',
-  'https://localhost:3000',
-];
+const { allowedCors } = require('../utils/constants');
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 

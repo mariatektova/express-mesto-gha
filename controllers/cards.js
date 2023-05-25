@@ -6,7 +6,7 @@ const NotFound = require('../errors/notFound');
 
 const checkCardId = (card, res) => {
   if (!card) {
-    throw new NotFound('Карточки с таким id не существует')
+    throw new NotFound('Карточки с таким id не существует');
   }
   return res.send(card);
 };
@@ -32,10 +32,11 @@ const createCard = (req, res, next) => {
       if (error.name === 'ValidationError') {
         next(
           new BadRequest(
-            'Данные переданы некорректно'),
+            'Данные переданы некорректно',
+          ),
         );
         next(error);
-      };
+      }
     });
 };
 
@@ -71,7 +72,7 @@ const putLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     cardId,
     { $addToSet: { likes: owner } },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   )
     .then((card) => checkCardId(card, res))
     .catch(next);
