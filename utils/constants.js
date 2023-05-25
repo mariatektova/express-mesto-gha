@@ -1,9 +1,14 @@
-const ERROR = 400;
-const ERROR_NOT_FOUND = 404;
-const ERROR_DEFAULT = 500;
+const JWT_SECRET = 'some-secret-key';
+const urlRegEx = /^(ftp|http|https):\/\/[^ "]+$/;
+
+const allowedCors = [
+  'http://mariatektova.nomoredomains.monster',
+  'https://mariatektova.nomoredomains.monster',
+  'localhost:3000',
+];
 
 module.exports = {
-  ERROR,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
+  urlRegEx,
+  JWT_SECRET,
+  allowedCors,
 };

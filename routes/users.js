@@ -1,4 +1,11 @@
 const usersRouter = require('express').Router();
+const { celebrate } = require('celebrate');
+const {
+  getUserByIdValidation,
+  editProfileValidation,
+  updateAvatarValidation,
+} = require('../validatioin');
+
 const {
   getUsers,
   getUserById,
@@ -8,10 +15,10 @@ const {
 } = require('../controllers/users');
 
 usersRouter.get('/', getUsers);
-usersRouter.get('/:userId', getUserById);
+usersRouter.get('/:userId', celebrate(getUserByIdValidation), getUserById);
 
-usersRouter.patch('/me', editProfile);
-usersRouter.patch('/me/avatar', updateAvatar);
+usersRouter.patch('/me', celebrate(editProfileValidation), editProfile);
+usersRouter.patch('/me/avatar', celebrate(updateAvatarValidation), updateAvatar);
 
 usersRouter.post('/', createUser);
 

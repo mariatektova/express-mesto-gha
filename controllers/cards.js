@@ -1,28 +1,26 @@
 /* eslint-disable no-underscore-dangle */
 const Card = require('../models/card');
 
-const { ERROR, ERROR_NOT_FOUND, ERROR_DEFAULT } = require('../utils/constants');
+const BadRequest = require('../errors/badRequest');
+const NotFound = require('../errors/notFound');
 
 const checkCardId = (card, res) => {
-  if (card) {
-    return res.send(card);
+  if (!card) {
+    throw new NotFound('Карточки с таким id не существует')
   }
-  return res.status(ERROR_NOT_FOUND).send({ message: 'Карточки с таким id не существует' });
+  return res.send(card);
 };
 
-const getCards = (req, res) => {
+const getCards = (res, next) => {
   Card.find({})
+    .populate(['owner', 'likes'])
     .then((cards) => {
       res.send(cards);
     })
-    .catch(() => {
-      res
-        .status(ERROR_DEFAULT)
-        .send({ message: 'Что-то пошло не так на сервере' });
-    });
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { _id } = req.user;
   const { name, link } = req.body;
 
@@ -32,79 +30,55 @@ const createCard = (req, res) => {
     })
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return res.status(ERROR).send({
-          message: 'Данные переданы некорретно.',
+        next(
+          new BadRequest(
+            'Данные переданы некорректно'
+          )
+        );
+      next(error);
+    };
 
-        });
-      }
-      return res
-        .status(ERROR_DEFAULT)
-        .send({ message: 'Что-то пошло не так на сервере' });
-    });
-};
 
-const deleteCard = (req, res) => {
-  const { cardId } = req.params;
+  const deleteCard = (req, res, next) => {
+    const { cardId } = req.params;
 
-  Card.deleteOne({ _id: cardId })
-    .then((card) => {
-      if (card.deletedCount === 0) {
-        return res
-          .status(ERROR_NOT_FOUND)
-          .send({ message: 'Карточки с таким id не существует' });
-      }
-      return res.send({ message: 'Карточка удалена' });
-    })
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        return res.status(ERROR).send({ message: 'Такого id не существует' });
-      }
-      return res
-        .status(ERROR_DEFAULT)
-        .send({ message: 'Что-то пошло не так на сервере' });
-    });
-};
+    Card.deleteOne({ _id: cardId })
+      .then((card) => {
+        if (card.deletedCount === 0) {
+          throw new NotFound('Карточки с таким id не существует');
+        }
+        return res.send({ message: 'Карточка удалена' });
+      })
+      .catch(next)
+  };
 
-const putDislike = (req, res) => {
-  const owner = req.user._id;
-  const { cardId } = req.params;
+  const putDislike = (req, res, next) => {
+    const owner = req.user._id;
+    const { cardId } = req.params;
 
-  Card.findByIdAndUpdate(
-    cardId,
-    { $pull: { likes: owner } },
-    { new: true, runValidators: true },
-  )
-    .then((card) => checkCardId(card, res))
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        return res.status(ERROR).send({ message: 'Некорректный _id' });
-      }
-      return res
-        .status(ERROR_DEFAULT)
-        .send({ message: 'Что-то пошло не так на сервере' });
-    });
-};
+    Card.findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: owner } },
+      { new: true, runValidators: true },
+    )
+      .then((card) => checkCardId(card, res))
+      .catch(next);
+  };
 
-const putLike = (req, res) => {
-  const owner = req.user._id;
-  const { cardId } = req.params;
+  const putLike = (req, res, next) => {
+    const owner = req.user._id;
+    const { cardId } = req.params;
 
-  Card.findByIdAndUpdate(
-    cardId,
-    { $addToSet: { likes: owner } },
-    { new: true, runValidators: true },
-  )
-    .then((card) => checkCardId(card, res))
-    .catch((error) => {
-      if (error.name === 'CastError') {
-        return res.status(ERROR).send({ message: 'Такого id не существует' });
-      }
-      return res
-        .status(ERROR_DEFAULT)
-        .send({ message: 'Что-то пошло не так на сервере' });
-    });
-};
+    Card.findByIdAndUpdate(
+      cardId,
+      { $addToSet: { likes: owner } },
+      { new: true, runValidators: true }
+    )
+      .then((card) => checkCardId(card, res))
+      .catch(next);
+    
+  };
 
-module.exports = {
-  getCards, deleteCard, putDislike, putLike, createCard,
-};
+      module.exports = {
+        getCards, deleteCard, putDislike, putLike, createCard,
+      };
