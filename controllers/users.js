@@ -23,19 +23,18 @@ const login = (req, res, next) => {
 
   User.findOne({ email })
     .select('+password')
-    .then((user) => {
+    .then(async (user) => {
       if (!user) {
         throw new Unauthorized('Неверные почта или пароль');
       }
-      return bcrypt.compare(password, user.password).then((matched) => {
-        if (!matched) {
-          next(new Unauthorized('Неверные почта или пароль'));
-        }
-        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-          expiresIn: '7d',
-        });
-        return res.send({ token });
+      const matched = await bcrypt.compare(password, user.password);
+      if (!matched) {
+        next(new Unauthorized('Неверные почта или пароль'));
+      }
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: '7d',
       });
+      return res.send({ token });
     })
     .catch(next);
 };
