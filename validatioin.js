@@ -1,4 +1,4 @@
-const { Joi } = require('celebrate');
+const { celebrate, Joi } = require('celebrate');
 const { urlRegEx } = require('./utils/constants');
 
 const signinValidation = {
@@ -38,53 +38,31 @@ const signupValidation = {
   }),
 };
 
-const getUserByIdValidation = {
-  params: Joi.object({
-    userId: Joi.string().hex().length(24).message('Некорректный id'),
+const getUserByIdValidation = celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().length(24).hex().required(),
   }),
-};
+});
 
-const editProfileValidation = {
-  body: Joi.object({
-    name: Joi.string().min(2).max(30).messages({
-      'string.min': 'Поле "имя" не должно быть меньше 2 символов',
-      'string.max': 'Поле "имя" не должно быть больше 30 символов',
-      'any.required': 'Поле "имя" не должно быть пустым',
-    }),
-    about: Joi.string().min(2).max(30).messages({
-      'string.min': 'Поле "род деятельности" не должно быть меньше 2 символов',
-      'string.max': 'Поле "род деятельности" не должно быть больше 30 символов',
-      'any.required': 'Поле "род деятельности" не должно быть пустым',
-    }),
+const editProfileValidation = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
   }),
-};
+});
 
-const updateAvatarValidation = {
-  body: Joi.object({
-    avatar: Joi.string().regex(urlRegEx).message('Невалидная ссылка'),
+const updateAvatarValidation = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().pattern(urlRegEx).required(),
   }),
-};
+});
 
-const createCardValidation = {
-  body: Joi.object({
-    name: Joi.string()
-      .min(2)
-      .max(30)
-      .messages({
-        'string.min': 'Название карточки не должно быть меньше 2 символов',
-        'string.max': 'Название карточки не должно быть больше 30 символов',
-        'any.required': 'Название карточки не должно быть пустым',
-      })
-      .required(),
-    link: Joi.string()
-      .regex(urlRegEx)
-      .messages({
-        'string.dataUri': 'Невалидная ссылка',
-        'any.required': 'Название карточки не должно быть пустым',
-      })
-      .required(),
+const createCardValidation = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(urlRegEx),
   }),
-};
+});
 
 const deleteCardValidation = {
   params: Joi.object({

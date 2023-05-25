@@ -10,6 +10,7 @@ const { JWT_SECRET } = require('../utils/constants');
 const NotFound = require('../errors/notFound');
 const Conflicted = require('../errors/conflicted');
 const Unauthorized = require('../errors/unauthorized');
+const BadRequest = require('../errors/badRequest');
 
 const checkUserId = (user, res) => {
   if (!user) {
@@ -29,7 +30,7 @@ const login = (req, res, next) => {
       }
       const matched = await bcrypt.compare(password, user.password);
       if (!matched) {
-        next(new Unauthorized('Неверные почта или пароль'));
+        throw new Unauthorized('Неверные почта или пароль');
       }
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: '7d',
@@ -66,6 +67,10 @@ const createUser = (req, res, next) => {
           next(
             new Conflicted('Пользователь с такой почтой уже зарегистрирвован'),
           );
+        } else if (error.name === 'ValidationError') {
+          next(new BadRequest('Переданы некорректные данные при создании пользователя'));
+        } else {
+          next(error);
         }
       });
   });

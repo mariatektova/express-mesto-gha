@@ -35,8 +35,8 @@ const createCard = (req, res, next) => {
             'Данные переданы некорректно',
           ),
         );
-        next(error);
       }
+      next(error);
     });
 };
 
