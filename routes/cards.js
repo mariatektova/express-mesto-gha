@@ -1,10 +1,6 @@
 const cardsRouter = require('express').Router();
 const { celebrate } = require('celebrate');
-const {
-  createCardValidation,
-  deleteCardValidation,
-  likeCardValidation,
-} = require('../validatioin');
+const { createCardValidation, deleteCardValidation, likeCardValidation } = require('../validatioin');
 
 const {
   createCard,

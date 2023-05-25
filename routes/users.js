@@ -1,10 +1,7 @@
+/* eslint-disable import/no-unresolved */
 const usersRouter = require('express').Router();
 const { celebrate } = require('celebrate');
-const {
-  getUserByIdValidation,
-  editProfileValidation,
-  updateAvatarValidation,
-} = require('../validatioin');
+const { getUserByIdValidation, editProfileValidation, updateAvatarValidation } = require('../validatioin');
 
 const {
   getUsers,

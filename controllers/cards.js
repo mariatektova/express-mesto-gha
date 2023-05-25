@@ -32,53 +32,51 @@ const createCard = (req, res, next) => {
       if (error.name === 'ValidationError') {
         next(
           new BadRequest(
-            'Данные переданы некорректно'
-          )
+            'Данные переданы некорректно'),
         );
-      next(error);
-    };
-
-
-  const deleteCard = (req, res, next) => {
-    const { cardId } = req.params;
-
-    Card.deleteOne({ _id: cardId })
-      .then((card) => {
-        if (card.deletedCount === 0) {
-          throw new NotFound('Карточки с таким id не существует');
-        }
-        return res.send({ message: 'Карточка удалена' });
-      })
-      .catch(next)
-  };
-
-  const putDislike = (req, res, next) => {
-    const owner = req.user._id;
-    const { cardId } = req.params;
-
-    Card.findByIdAndUpdate(
-      cardId,
-      { $pull: { likes: owner } },
-      { new: true, runValidators: true },
-    )
-      .then((card) => checkCardId(card, res))
-      .catch(next);
-  };
-
-  const putLike = (req, res, next) => {
-    const owner = req.user._id;
-    const { cardId } = req.params;
-
-    Card.findByIdAndUpdate(
-      cardId,
-      { $addToSet: { likes: owner } },
-      { new: true, runValidators: true }
-    )
-      .then((card) => checkCardId(card, res))
-      .catch(next);
-    
-  };
-
-      module.exports = {
-        getCards, deleteCard, putDislike, putLike, createCard,
+        next(error);
       };
+    });
+};
+
+const deleteCard = (req, res, next) => {
+  const { cardId } = req.params;
+  Card.deleteOne({ _id: cardId })
+    .then((card) => {
+      if (card.deletedCount === 0) {
+        throw new NotFound('Карточки с таким id не существует');
+      }
+      return res.send({ message: 'Карточка удалена' });
+    })
+    .catch(next);
+};
+
+const putDislike = (req, res, next) => {
+  const owner = req.user._id;
+  const { cardId } = req.params;
+
+  Card.findByIdAndUpdate(
+    cardId,
+    { $pull: { likes: owner } },
+    { new: true, runValidators: true },
+  )
+    .then((card) => checkCardId(card, res))
+    .catch(next);
+};
+
+const putLike = (req, res, next) => {
+  const owner = req.user._id;
+  const { cardId } = req.params;
+
+  Card.findByIdAndUpdate(
+    cardId,
+    { $addToSet: { likes: owner } },
+    { new: true, runValidators: true }
+  )
+    .then((card) => checkCardId(card, res))
+    .catch(next);
+};
+
+module.exports = {
+  getCards, deleteCard, putDislike, putLike, createCard,
+};
