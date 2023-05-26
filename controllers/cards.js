@@ -25,7 +25,7 @@ const createCard = (req, res, next) => {
   const { _id } = req.user;
   const { name, link } = req.body;
 
-Card.create({ name, link, owner: _id })
+  Card.create({ name, link, owner: _id })
     .then((newCard) => {
       res.send(newCard);
     })
@@ -44,7 +44,8 @@ Card.create({ name, link, owner: _id })
 
 const deleteCard = (req, res, next) => {
   const { cardId } = req.params;
-   Card.findById(id)
+  const idUser = req.user._id;
+  Card.findById(cardId)
     .then((cardFind) => {
       if (!cardFind) {
         const err = new NotFound('Карточки с таким id не существует');
@@ -72,7 +73,6 @@ const deleteCard = (req, res, next) => {
       }
     });
 };
-
 
 const putDislike = (req, res, next) => {
   const owner = req.user._id;
